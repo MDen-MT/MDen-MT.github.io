@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {getSunPosition} from './celestial-bodies-positions.js';
 
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
@@ -13,18 +14,19 @@ window.onresize = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-scene.add(directionalLight);
-directionalLight.position.set(33888, 5000, 0);
-
 const light = new THREE.AmbientLight(0xffffff, 0.005);
 scene.add(light);
 
 const sunGeometry = new THREE.SphereGeometry(207, 32, 16);
-const sunMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+const sunMaterial = new THREE.MeshBasicMaterial({color: 0xffe100});
 const sun = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sun);
-sun.position.set(33888, 5000, 0);
+const sunPosition = await getSunPosition();
+sun.position.set(sunPosition.x/3390, sunPosition.y/3390, sunPosition.z/3390);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+scene.add(directionalLight);
+directionalLight.position.set(sunPosition.x/3390, sunPosition.y/3390, sunPosition.z/3390);
 
 // const marsGeometry = new THREE.SphereGeometry(1, 64, 32);
 // const marsTexture = textureLoader.load('./assets/images/8k_mars.jpg');
