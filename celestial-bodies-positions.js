@@ -29,7 +29,7 @@ function getPosition(data) {
     const x = Number(position[1]);
     const y = Number(position[2]);
     const z = Number(position[3]);
-    return {x,y,z}
+    return {x, y, z}
 }
 
 async function getData(url) {
@@ -42,13 +42,14 @@ async function getData(url) {
     }
 }
 
-function getTime(hoursAfter=0) {
+function getTime(hoursAfter = 0) {
     const time = new Date();
+    time.setHours(time.getHours() + hoursAfter);
 
     const year = time.getUTCFullYear();
     const month = time.getUTCMonth() + 1;
     const day = time.getUTCDate();
-    const hour = time.getUTCHours()+hoursAfter;
+    const hour = time.getUTCHours();
     const minute = time.getUTCMinutes();
     const second = time.getUTCSeconds();
 
