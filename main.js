@@ -52,11 +52,12 @@ loader.load('./assets/mars.glb',
 function animate(time) {
     if (mars) {
         mars.rotation.y = time / 5000;
+        mars.rotation.x = 1.131;
     }
 
     renderer.render(scene, camera);
     const radius = 2;
-    let deg = 30;
+    let deg = 0;
     let rad = deg * Math.PI / 180;
     let cos = Math.cos(rad);
     let sin = Math.sin(rad);
