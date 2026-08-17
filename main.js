@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-import {getSunPosition} from './celestial-bodies-positions.js';
+import {getDeimosPosition, getPhobosPosition, getSunPosition} from './celestial-bodies-positions.js';
 
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
@@ -47,16 +47,40 @@ loader.load('./assets/mars.glb',
     function (gltf) {
         mars = gltf.scene;
         scene.add(mars);
+        mars.scale.set(0.002, 0.002, 0.002);
+        mars.rotation.x = 1.131;
     });
+
+let phobos;
+loader.load('./assets/phobos.glb',
+    async function (gltf) {
+        phobos = gltf.scene;
+        scene.add(phobos);
+        phobos.scale.set(0.02, 0.02, 0.02);
+        const phobosPosition = await getPhobosPosition();
+        console.log(phobosPosition);
+        phobos.position.set(phobosPosition.x/3390, phobosPosition.y/3390, phobosPosition.z/3390);
+    });
+
+let deimos;
+loader.load('./assets/deimos.glb',
+    async function (gltf) {
+        deimos = gltf.scene;
+        scene.add(deimos);
+        deimos.scale.set(0.02, 0.02, 0.02);
+        const deimosPosition = await getDeimosPosition();
+        console.log(deimosPosition);
+        deimos.position.set(deimosPosition.x/3390, deimosPosition.y/3390, deimosPosition.z/3390);
+    });
+
 
 function animate(time) {
     if (mars) {
         mars.rotation.y = time / 5000;
-        mars.rotation.x = 1.131;
     }
 
     renderer.render(scene, camera);
-    const radius = 2;
+    const radius = 10;
     let deg = 0;
     let rad = deg * Math.PI / 180;
     let cos = Math.cos(rad);

@@ -10,7 +10,53 @@ export async function getSunPosition() {
         CENTER: '500@499',
         START_TIME: start,
         STOP_TIME: end,
-        STEP_SIZE: '1d'
+        STEP_SIZE: '1m'
+    }
+    const queryString = new URLSearchParams(params).toString();
+
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
+
+    let data = await getData(proxyUrl);
+    let result = data.result;
+    let position = getPosition(result);
+
+    return position;
+}
+
+export async function getPhobosPosition() {
+    const start = getTime();
+    const end = getTime(1);
+    const params = {
+        COMMAND: '401',
+        EPHEM_TYPE: 'VECTORS',
+        MAKE_EPHEM: 'YES',
+        CENTER: '@499',
+        START_TIME: start,
+        STOP_TIME: end,
+        STEP_SIZE: '1m'
+    }
+    const queryString = new URLSearchParams(params).toString();
+
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
+
+    let data = await getData(proxyUrl);
+    let result = data.result;
+    let position = getPosition(result);
+
+    return position;
+}
+
+export async function getDeimosPosition() {
+    const start = getTime();
+    const end = getTime(1);
+    const params = {
+        COMMAND: '402',
+        EPHEM_TYPE: 'VECTORS',
+        MAKE_EPHEM: 'YES',
+        CENTER: '@499',
+        START_TIME: start,
+        STOP_TIME: end,
+        STEP_SIZE: '1m'
     }
     const queryString = new URLSearchParams(params).toString();
 
