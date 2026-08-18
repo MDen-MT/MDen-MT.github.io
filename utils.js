@@ -18,7 +18,5 @@ export function interpolatePosition(positions, time, interval) {
 
     const vector = new THREE.Vector3().fromArray(newPosition);
 
-    console.log(vector);
-
     return {position: vector, stepId};
 }

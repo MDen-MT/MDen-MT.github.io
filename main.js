@@ -85,7 +85,6 @@ function animate(time) {
         if (body.isAwaiting || name==="mars") return;
 
         const {position, stepId} = interpolatePosition(body.positions, time, body.interval);
-        console.log(stepId)
         body.mesh.position.copy(position);
 
         if (name==="sun") {
