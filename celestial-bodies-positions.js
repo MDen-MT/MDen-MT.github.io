@@ -1,81 +1,45 @@
 const url = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 
-export async function getSunPosition() {
-    const start = getTime();
-    const end = getTime(1);
+const bodies = {
+    'sun': {command: '10', stepSize: '24h'},
+    'phobos': {command: '401', stepSize: '10m'},
+    'deimos': {command: '402', stepSize: '10m'},
+}
+
+function getIsoTime(hoursAhead = 0) {
+    const time = new Date(Date.now() + hoursAhead*3600000);
+    return time.toISOString().slice(0, 19).replace('T', '-');
+}
+
+export async function getPositions(body) {
     const params = {
-        COMMAND: '10',
+        COMMAND: bodies[body].command,
         EPHEM_TYPE: 'VECTORS',
         MAKE_EPHEM: 'YES',
         CENTER: '500@499',
-        START_TIME: start,
-        STOP_TIME: end,
-        STEP_SIZE: '1m'
+        START_TIME: getIsoTime(0),
+        STOP_TIME: getIsoTime(24),
+        STEP_SIZE: bodies[body].stepSize,
     }
-    const queryString = new URLSearchParams(params).toString();
 
+    const queryString = new URLSearchParams(params).toString();
     const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
 
     let data = await getData(proxyUrl);
     let result = data.result;
-    let position = getPosition(result);
+    const timeData = result.split('$$SOE')[1].split('$$EOE')[0].split('\n');
 
-    return position;
-}
-
-export async function getPhobosPosition() {
-    const start = getTime();
-    const end = getTime(1);
-    const params = {
-        COMMAND: '401',
-        EPHEM_TYPE: 'VECTORS',
-        MAKE_EPHEM: 'YES',
-        CENTER: '@499',
-        START_TIME: start,
-        STOP_TIME: end,
-        STEP_SIZE: '1m'
+    const positions = [];
+    for (let i = 2; i < timeData.length; i+=4) {
+        const positionArray = timeData[i].split(/ X\s*=*| Y\s*=*| Z\s*=/);
+        positionArray.shift();
+        positionArray.forEach((position, index) => {
+            positionArray[index] = Number(position)/3390;
+        });
+        positions.push(positionArray);
     }
-    const queryString = new URLSearchParams(params).toString();
 
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
-
-    let data = await getData(proxyUrl);
-    let result = data.result;
-    let position = getPosition(result);
-
-    return position;
-}
-
-export async function getDeimosPosition() {
-    const start = getTime();
-    const end = getTime(1);
-    const params = {
-        COMMAND: '402',
-        EPHEM_TYPE: 'VECTORS',
-        MAKE_EPHEM: 'YES',
-        CENTER: '@499',
-        START_TIME: start,
-        STOP_TIME: end,
-        STEP_SIZE: '1m'
-    }
-    const queryString = new URLSearchParams(params).toString();
-
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
-
-    let data = await getData(proxyUrl);
-    let result = data.result;
-    let position = getPosition(result);
-
-    return position;
-}
-
-function getPosition(data) {
-    const timeData = data.split('$$SOE')[1].split('$$EOE')[0];
-    const position = timeData.split('\n')[2].split(/ X\s*=*| Y\s*=*| Z\s*=/);
-    const x = Number(position[1]);
-    const y = Number(position[2]);
-    const z = Number(position[3]);
-    return {x, y, z}
+    return positions;
 }
 
 async function getData(url) {
@@ -86,18 +50,4 @@ async function getData(url) {
     } catch (error) {
         console.error(error);
     }
-}
-
-function getTime(hoursAfter = 0) {
-    const time = new Date();
-    time.setHours(time.getHours() + hoursAfter);
-
-    const year = time.getUTCFullYear();
-    const month = time.getUTCMonth() + 1;
-    const day = time.getUTCDate();
-    const hour = time.getUTCHours();
-    const minute = time.getUTCMinutes();
-    const second = time.getUTCSeconds();
-
-    return `${year}-${month}-${day}-${hour}:${minute}:${second}`;
 }
