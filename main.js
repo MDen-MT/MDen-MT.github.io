@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {getPositions} from './celestial-bodies-positions.js';
 import {interpolatePosition} from './utils.js';
 
@@ -13,6 +14,13 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
+camera.position.set(0, 0, 10);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.maxDistance = 500;
+controls.minDistance = 2;
 
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
@@ -45,7 +53,7 @@ async function init() {
     const sunMaterial = new THREE.MeshBasicMaterial({color: 0xffe100});
 
     bodies.sun.mesh = new THREE.Mesh(sunGeometry, sunMaterial);
-    bodies.sun.light =  new THREE.DirectionalLight(0xffffff, 1);
+    bodies.sun.light = new THREE.DirectionalLight(0xffffff, 1);
     scene.add(bodies.sun.mesh, bodies.sun.light);
 
     const initialSunPos = new THREE.Vector3().fromArray(bodies.sun.positions[0])
@@ -82,41 +90,22 @@ function animate(time) {
     bodies.mars.mesh.rotation.y = time / 5000;
 
     Object.entries(bodies).forEach(([name, body]) => {
-        if (body.isAwaiting || name==="mars") return;
+        if (body.isAwaiting || name === "mars") return;
 
         const {position, stepId} = interpolatePosition(body.positions, time, body.interval);
         body.mesh.position.copy(position);
 
-        if (name==="sun") {
+        if (name === "sun") {
             body.light.position.copy(position);
         }
 
-        if (stepId+2>=body.positions.length) {
+        if (stepId + 2 >= body.positions.length) {
             getBodyPositions(name);
         }
+
     });
 
-    const radius = 10;
-    let deg = 0;
-    let rad = deg * Math.PI / 180;
-    let cos = Math.cos(rad);
-    let sin = Math.sin(rad);
-    let z;
-    if (cos === 0) {
-        z = 0;
-    } else {
-        z = radius * cos;
-    }
-    let x;
-    if (sin === 0) {
-        x = 0;
-    } else {
-        x = radius * sin;
-    }
-    camera.rotation.y = rad;
-    camera.position.z = z;
-    camera.position.x = x;
-
+    controls.update();
     renderer.render(scene, camera);
 }
 
