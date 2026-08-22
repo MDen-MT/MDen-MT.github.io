@@ -2,8 +2,8 @@ import * as THREE from 'three';
 
 const axis_x = new THREE.Vector3(1, 0, 0);
 const angle_x = -Math.PI/2;
-const axis_y = new THREE.Vector3(0, 0, 1);
-const angle_y = Math.PI/2-1.131;
+const axis_z = new THREE.Vector3(0, 0, 1);
+const angle_z = Math.PI/2-1.131;
 
 export function interpolatePosition(positions, time, interval) {
     const step = time * interval;
@@ -22,7 +22,7 @@ export function interpolatePosition(positions, time, interval) {
     const vector = new THREE.Vector3().fromArray(newPosition);
 
     vector.applyAxisAngle(axis_x, angle_x);
-    vector.applyAxisAngle(axis_y, angle_y);
+    vector.applyAxisAngle(axis_z, angle_z);
 
     return {position: vector, stepId};
 }
