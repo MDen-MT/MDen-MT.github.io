@@ -102,6 +102,8 @@ function animate(time) {
         if (stepId + 2 >= body.positions.length) {
             getBodyPositions(name);
         }
+
+        body.mesh.lookAt(0, 0, 0);
     });
 
     controls.update();
