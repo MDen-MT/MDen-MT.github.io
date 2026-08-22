@@ -68,7 +68,7 @@ async function init() {
 
     bodies.mars.mesh = marsGltf.scene;
     bodies.mars.mesh.scale.setScalar(0.002);
-    bodies.mars.mesh.rotation.x = 1.131;
+
     scene.add(bodies.mars.mesh);
 
     await getBodyPositions('phobos', true);
@@ -102,7 +102,6 @@ function animate(time) {
         if (stepId + 2 >= body.positions.length) {
             getBodyPositions(name);
         }
-
     });
 
     controls.update();
