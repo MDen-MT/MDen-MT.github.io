@@ -23,7 +23,7 @@ export async function getPositions(body) {
     }
 
     const queryString = new URLSearchParams(params).toString();
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(`${url}?${queryString}`);
+    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(`${url}?${queryString}`);
 
     let data = await getData(proxyUrl);
     let result = data.result;
