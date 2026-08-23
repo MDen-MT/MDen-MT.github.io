@@ -24,6 +24,7 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 controls.maxDistance = 500;
 controls.minDistance = 2;
+controls.enablePan = false;
 
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
