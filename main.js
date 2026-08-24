@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
-import {getPositions} from './celestial-bodies-positions.js';
+import {getPositions, calculateMarsRotation} from './celestial-bodies-positions.js';
 import {interpolatePosition} from './utils.js';
 
 
-const Interval1Hour = 1 / 86400000;
-const Interval10Minutes = 1 / 600000;
+const interval1Hour = 1 / 86400000;
+const interval10Minutes = 1 / 600000;
+
+const startTime = Date.now();
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -17,7 +19,7 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
-camera.position.set(0, 0, 10);
+camera.position.set(10, 0, 0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -40,9 +42,9 @@ scene.add(spotLight);
 scene.add(spotLight.target)
 
 const bodies = {
-    sun: {interval: Interval1Hour, positions: [], isAwaiting: true, mesh: null, light: null},
-    phobos: {interval: Interval10Minutes, positions: [], isAwaiting: true, mesh: null},
-    deimos: {interval: Interval10Minutes, positions: [], isAwaiting: true, mesh: null},
+    sun: {interval: interval1Hour, positions: [], isAwaiting: true, mesh: null, light: null},
+    phobos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
+    deimos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
     mars: {mesh: null},
 }
 
@@ -125,7 +127,7 @@ async function init() {
 }
 
 function animate(time) {
-    bodies.mars.mesh.rotation.y = time / 5000;
+    bodies.mars.mesh.rotation.y = calculateMarsRotation(startTime + time);
 
     Object.entries(bodies).forEach(([name, body]) => {
         if (body.isAwaiting || name === "mars") return;
