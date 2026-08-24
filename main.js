@@ -83,9 +83,12 @@ async function init() {
         loader.loadAsync('./assets/deimos.glb'),
     ])
 
+    const [marsSurfaceMap, marsNormalMap] = await Promise.all([
+        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png'),
+        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png'),
+    ])
+
     const marsGeometry = new THREE.SphereGeometry(1, 64, 32);
-    const marsSurfaceMap = textureLoader.load('./assets/images/Mars_8K_Surface.png');
-    const marsNormalMap = textureLoader.load('./assets/images/Mars_8K_Normal.png');
     const marsMaterial = new THREE.MeshStandardMaterial({
         map: marsSurfaceMap,
         normalMap: marsNormalMap,
