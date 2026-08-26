@@ -3,7 +3,8 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 import {getPositions, calculateMarsRotation} from './celestial-bodies-positions.js';
-import {interpolatePosition} from './utils.js';
+import {arrayToRotatedVector, interpolatePosition} from './utils.js';
+import {updateProgressBar, yieldToBrowser} from './progress-bar.js';
 
 
 const interval1Hour = 1 / 86400000;
@@ -61,6 +62,7 @@ async function getBodyPositions(body, isInitial = false) {
 }
 
 async function init() {
+    updateProgressBar('Placing Sun...');
     await getBodyPositions('sun', true);
     const sunGeometry = new THREE.SphereGeometry(207, 32, 16);
     const sunMaterial = new THREE.MeshBasicMaterial({color: 0xffe100});
@@ -73,21 +75,24 @@ async function init() {
     bodies.sun.light.shadow.bias = -0.0001;
     scene.add(bodies.sun.mesh, bodies.sun.light);
 
-    const initialSunPos = new THREE.Vector3().fromArray(bodies.sun.positions[0].map(num => num / 1000));
+    const initialSunPos = arrayToRotatedVector(bodies.sun.positions[0].map(num => num / 1000));
     bodies.sun.mesh.position.copy(initialSunPos);
     bodies.sun.light.position.copy(initialSunPos);
 
+    updateProgressBar('Loading models...');
     const [marsGltf, phobosGltf, deimosGltf] = await Promise.all([
-        loader.loadAsync('./assets/mars.glb'),
-        loader.loadAsync('./assets/phobos.glb'),
-        loader.loadAsync('./assets/deimos.glb'),
+        loader.loadAsync('./assets/models/mars.glb'),
+        loader.loadAsync('./assets/models/phobos.glb'),
+        loader.loadAsync('./assets/models/deimos.glb'),
     ])
 
+    updateProgressBar('Loading textures...');
     const [marsSurfaceMap, marsNormalMap] = await Promise.all([
         textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png'),
         textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png'),
     ])
 
+    updateProgressBar('Placing Mars...');
     const marsGeometry = new THREE.SphereGeometry(1, 64, 32);
     const marsMaterial = new THREE.MeshStandardMaterial({
         map: marsSurfaceMap,
@@ -100,12 +105,15 @@ async function init() {
     bodies.mars.mesh = new THREE.Mesh(marsGeometry, marsMaterial);
     bodies.mars.mesh.castShadow = true;
     bodies.mars.mesh.receiveShadow = true;
+    bodies.mars.mesh.rotation.y = calculateMarsRotation(startTime);
     scene.add(bodies.mars.mesh);
 
+    updateProgressBar('Placing Phobos...');
     await getBodyPositions('phobos', true);
+    const initialPhobosPos = arrayToRotatedVector(bodies.phobos.positions[0]);
     bodies.phobos.mesh = phobosGltf.scene;
     bodies.phobos.mesh.scale.setScalar(0.01);
-    bodies.phobos.mesh.position.fromArray(bodies.phobos.positions[0]);
+    bodies.phobos.mesh.position.copy(initialPhobosPos);
     bodies.phobos.mesh.traverse((child) => {
         if (child.isMesh) {
             child.castShadow = true;
@@ -114,10 +122,12 @@ async function init() {
     })
     scene.add(bodies.phobos.mesh);
 
+    updateProgressBar('Placing Deimos...');
     await getBodyPositions('deimos', true);
+    const initialDeimosPos = arrayToRotatedVector(bodies.deimos.positions[0]);
     bodies.deimos.mesh = deimosGltf.scene;
     bodies.deimos.mesh.scale.setScalar(0.01);
-    bodies.deimos.mesh.position.fromArray(bodies.deimos.positions[0]);
+    bodies.deimos.mesh.position.copy(initialDeimosPos);
     bodies.deimos.mesh.traverse((child) => {
         if (child.isMesh) {
             child.castShadow = true;
@@ -126,6 +136,10 @@ async function init() {
     })
     scene.add(bodies.deimos.mesh);
 
+    updateProgressBar('Rendering scene...');
+    await yieldToBrowser();
+    renderer.render(scene, camera);
+    updateProgressBar('done');
     renderer.setAnimationLoop(animate);
 }
 

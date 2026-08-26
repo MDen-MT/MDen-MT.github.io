@@ -1,0 +1,44 @@
+@font-face {
+    font-family: 'Disket-Mono-Regular';
+    src: url('/assets/fonts/Disket-Mono-Regular.ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    margin: 0;
+    background: black;
+}
+
+.loading-screen {
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #FF3131;
+    font-family: 'Disket-Mono-Regular';
+}
+
+.neon {
+    filter: drop-shadow(0 0 1px #FF3131) drop-shadow(0 0 5px #FF3131);
+}
+
+.progress-bar {
+    border-style: solid;
+    border-color: #FF3131;
+    padding: 5px;
+    width: 50%;
+    min-width: 320px;
+}
+
+.progress-meter {
+    height: 10px;
+    background-color: #FF3131;
+    width: 0;
+    transition: width 0.3s ease-out;
+    will-change: width;
+}

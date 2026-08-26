@@ -19,10 +19,16 @@ export function interpolatePosition(positions, time, interval) {
     newPosition[1] = start[1] + (target[1] - start[1]) * t;
     newPosition[2] = start[2] + (target[2] - start[2]) * t;
 
-    const vector = new THREE.Vector3().fromArray(newPosition);
+    const vector = arrayToRotatedVector(newPosition);
+
+    return {position: vector, stepId};
+}
+
+export function arrayToRotatedVector(array) {
+    const vector = new THREE.Vector3().fromArray(array);
 
     vector.applyAxisAngle(axis_x, angle_x);
     vector.applyAxisAngle(axis_z, angle_z);
 
-    return {position: vector, stepId};
+    return vector;
 }
