@@ -80,8 +80,7 @@ async function init() {
     bodies.sun.light.position.copy(initialSunPos);
 
     updateProgressBar('Loading models...');
-    const [marsGltf, phobosGltf, deimosGltf] = await Promise.all([
-        loader.loadAsync('./assets/models/mars.glb'),
+    const [phobosGltf, deimosGltf] = await Promise.all([
         loader.loadAsync('./assets/models/phobos.glb'),
         loader.loadAsync('./assets/models/deimos.glb'),
     ])
