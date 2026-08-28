@@ -24,7 +24,7 @@ export async function getPositions(body) {
     }
 
     const queryString = new URLSearchParams(params).toString();
-    const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(`${url}?${queryString}`);
+    const proxyUrl = `https://jpl-proxy.mden.workers.dev/?${queryString}`;
 
     let data = await getData(proxyUrl);
     let result = data.result;
@@ -45,9 +45,35 @@ export async function getPositions(body) {
 
 async function getData(url) {
     try {
-        const response = await fetch(url);
+        let request;
+        if (window.location.hostname === 'mden-mt.github.io') {
+            request = {};
+        } else {
+            const apiKey = await getAPIKey();
+            request = {headers: {
+                    'x-api-key': apiKey,
+                }};
+        }
+
+        const response = await fetch(url, request);
         const data = await response.json();
         return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getAPIKey() {
+    try {
+        const response = await fetch('secret.json');
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const data = await response.json();
+
+        return data['api-key'];
     } catch (error) {
         console.error(error);
     }
