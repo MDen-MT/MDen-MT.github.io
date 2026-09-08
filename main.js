@@ -28,6 +28,8 @@ controls.dampingFactor = 0.05;
 controls.maxDistance = 500;
 controls.minDistance = 2;
 controls.enablePan = false;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.1;
 
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
