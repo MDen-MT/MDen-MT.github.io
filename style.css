@@ -6,9 +6,26 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Orbitron Light';
+    src: url('/assets/fonts/Orbitron Light.ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Orbitron Bold';
+    src: url('/assets/fonts/Orbitron Bold.ttf');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     margin: 0;
     background: black;
+    font-family: 'Orbitron Light', sans-serif;
 }
 
 .loading-screen {
@@ -19,17 +36,23 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    color: #FF3131;
-    font-family: 'Disket-Mono-Regular';
+    color: #E61E32;
 }
 
-.neon {
-    filter: drop-shadow(0 0 1px #FF3131) drop-shadow(0 0 5px #FF3131);
+.neon-red {
+    color: #E61E32;
+    filter: drop-shadow(0 0 1px #E61E32) drop-shadow(0 0 5px #E61E32);
 }
+
+.neon-white {
+    color: white;
+    filter: drop-shadow(0 0 1px white) drop-shadow(0 0 3px white);
+}
+
 
 .progress-bar {
     border-style: solid;
-    border-color: #FF3131;
+    border-color: #E61E32;
     padding: 5px;
     width: 50%;
     min-width: 320px;
@@ -37,8 +60,75 @@ body {
 
 .progress-meter {
     height: 10px;
-    background-color: #FF3131;
+    background-color: #E61E32;
     width: 0;
     transition: width 0.3s ease-out;
     will-change: width;
+}
+
+.wrapper {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+}
+
+.polygon {
+    stroke-width: 3px;
+    stroke: #E61E32;
+    padding: 10px;
+    fill: #E61E320C;
+    pointer-events: fill;
+}
+
+.info {
+    position: absolute;
+    left: 24px;
+    color: white;
+}
+
+.normal-text {
+    font-family: 'Orbitron Light', sans-serif;
+    font-size: 24px
+}
+
+.medium-text {
+    font-family: 'Orbitron Light', sans-serif;
+    font-size: 36px;
+}
+
+.large-text {
+    font-family: 'Orbitron Bold', sans-serif;
+    font-size: 48px;
+}
+
+span {
+    pointer-events: fill;
+}
+
+@keyframes brokenLight {
+    0%, 18%, 22%, 25%, 53%, 57%, 100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 1px #E61E32) drop-shadow(0 0 5px #E61E32);
+    }
+    20%, 24%, 55% {
+        opacity: 1;
+        filter: none;
+    }
+}
+
+.neon-red::selection {
+    background: #E61E32;
+    color: white;
+}
+
+.neon-white::selection {
+    background: white;
+    color: #E61E32;
+}
+
+::selection {
+    background: white;
+    color: #E61E32;
 }

@@ -20,7 +20,7 @@ document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
-camera.position.set(10, 0, 0);
+camera.position.set(5, 0, 0);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -43,7 +43,7 @@ scene.add(spotLight);
 scene.add(spotLight.target)
 
 const bodies = {
-    sun: {interval: interval1Hour, positions: [], isAwaiting: true, mesh: null, light: null},
+    sun: {interval: interval1Hour, positions: [], isAwaiting: true, mesh: null, light: null, sky: null},
     phobos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
     deimos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
     mars: {mesh: null},
@@ -62,6 +62,19 @@ async function getBodyPositions(body, isInitial = false) {
 }
 
 async function init() {
+    updateProgressBar('Loading models...');
+    const [phobosGltf, deimosGltf] = await Promise.all([
+        loader.loadAsync('./assets/models/phobos.glb'),
+        loader.loadAsync('./assets/models/deimos.glb'),
+    ])
+
+    updateProgressBar('Loading textures...');
+    const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
+        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png'),
+        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png'),
+        textureLoader.loadAsync('./assets/images/starmap_g16k.jpg'),
+    ])
+
     updateProgressBar('Placing Sun...');
     await getBodyPositions('sun', true);
     const sunGeometry = new THREE.SphereGeometry(207, 32, 16);
@@ -79,17 +92,17 @@ async function init() {
     bodies.sun.mesh.position.copy(initialSunPos);
     bodies.sun.light.position.copy(initialSunPos);
 
-    updateProgressBar('Loading models...');
-    const [phobosGltf, deimosGltf] = await Promise.all([
-        loader.loadAsync('./assets/models/phobos.glb'),
-        loader.loadAsync('./assets/models/deimos.glb'),
-    ])
-
-    updateProgressBar('Loading textures...');
-    const [marsSurfaceMap, marsNormalMap] = await Promise.all([
-        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png'),
-        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png'),
-    ])
+    updateProgressBar('Placing stars...');
+    const skyGeometry = new THREE.SphereGeometry(100000, 64, 32);
+    const skyMaterial = new THREE.MeshBasicMaterial({
+        map: skyMap,
+        color: 0x292828,
+        side: THREE.DoubleSide,
+    });
+    bodies.sun.sky = new THREE.Mesh(skyGeometry, skyMaterial);
+    bodies.sun.sky.position.copy(initialSunPos);
+    bodies.sun.sky.lookAt(0,0,0);
+    scene.add(bodies.sun.sky);
 
     updateProgressBar('Placing Mars...');
     const marsGeometry = new THREE.SphereGeometry(1, 64, 32);
@@ -154,6 +167,8 @@ function animate(time) {
         if (name === "sun") {
             body.light.position.copy(position.divideScalar(1000));
             spotLight.target.position.copy(position);
+
+            body.sky.lookAt(0,0,0);
         }
 
         if (stepId + 2 >= body.positions.length) {
