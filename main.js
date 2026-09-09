@@ -66,25 +66,28 @@ async function getBodyPositions(body, isInitial = false) {
 async function init() {
     updateProgressBar('Loading models...');
     const [phobosGltf, deimosGltf] = await Promise.all([
-        loadModelWithProgress('./assets/models/phobos.glb', (percent) => {
-            console.log(percent);
-        }),
-        loadModelWithProgress('./assets/models/deimos.glb', (percent) => {
-            console.log(percent);
-        }),
+        loadModelWithProgress('./assets/models/phobos.glb',
+            (percent) => console.log(percent),
+            (model) => console.log("Phobos done")),
+
+        loadModelWithProgress('./assets/models/deimos.glb',
+            (percent) => console.log(percent),
+            (model) => console.log("Deimos done")),
     ])
 
     updateProgressBar('Loading textures...');
     const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
-        loadTextureWithProgress('./assets/images/Mars_8K_Surface.png', (percent) => {
-            console.log(percent);
-        }),
-        loadTextureWithProgress('./assets/images/Mars_8K_Normal.png', (percent) => {
-            console.log(percent);
-        }),
-        loadTextureWithProgress('./assets/images/starmap_g16k.jpg', (percent) => {
-            console.log(percent);
-        }),
+        loadTextureWithProgress('./assets/images/Mars_8K_Surface.png',
+            (percent) => console.log(percent),
+            (texture) => console.log("Mars surface done")),
+
+        loadTextureWithProgress('./assets/images/Mars_8K_Normal.png',
+            (percent) => console.log(percent),
+            (texture) => console.log("Mars normal done")),
+
+        loadTextureWithProgress('./assets/images/starmap_g16k.jpg',
+            (percent) => console.log(percent),
+            (texture) => console.log("star map done")),
     ]);
 
     updateProgressBar('Placing Sun...');
@@ -194,10 +197,13 @@ function animate(time) {
     renderer.render(scene, camera);
 }
 
-function loadModelWithProgress(url, onProgress) {
+function loadModelWithProgress(url, onProgress, onLoad) {
     return new Promise((resolve, reject) => {
         loader.load(url,
-            (texture) => resolve(texture),
+            (model) => {
+                if (onLoad) onLoad(model, url);
+                resolve(model)
+            },
             (xhr) => {
                 if (xhr.lengthComputable) {
                     const percentComplete = Math.min(Math.round(xhr.loaded / xhr.total * 100), 100);
@@ -209,13 +215,16 @@ function loadModelWithProgress(url, onProgress) {
     });
 }
 
-function loadTextureWithProgress(url, onProgress) {
+function loadTextureWithProgress(url, onProgress, onLoad) {
     return new Promise((resolve, reject) => {
         textureLoader.load(url,
-            (texture) => resolve(texture),
+            (texture) => {
+                if (onLoad) onLoad(texture, url);
+                resolve(texture)
+            },
             (xhr) => {
                 if (xhr.lengthComputable) {
-                    const percentComplete = Math.round(xhr.loaded / xhr.total * 100);
+                    const percentComplete = Math.min(Math.round(xhr.loaded / xhr.total * 100), 100);
                     onProgress(percentComplete, xhr.loaded, xhr.total);
                 }
             },
