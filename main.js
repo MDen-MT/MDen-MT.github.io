@@ -66,16 +66,26 @@ async function getBodyPositions(body, isInitial = false) {
 async function init() {
     updateProgressBar('Loading models...');
     const [phobosGltf, deimosGltf] = await Promise.all([
-        loader.loadAsync('./assets/models/phobos.glb'),
-        loader.loadAsync('./assets/models/deimos.glb'),
+        loadModelWithProgress('./assets/models/phobos.glb', (percent) => {
+            console.log(percent);
+        }),
+        loadModelWithProgress('./assets/models/deimos.glb', (percent) => {
+            console.log(percent);
+        }),
     ])
 
     updateProgressBar('Loading textures...');
     const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
-        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png'),
-        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png'),
-        textureLoader.loadAsync('./assets/images/starmap_g16k.jpg'),
-    ])
+        loadTextureWithProgress('./assets/images/Mars_8K_Surface.png', (percent) => {
+            console.log(percent);
+        }),
+        loadTextureWithProgress('./assets/images/Mars_8K_Normal.png', (percent) => {
+            console.log(percent);
+        }),
+        loadTextureWithProgress('./assets/images/starmap_g16k.jpg', (percent) => {
+            console.log(percent);
+        }),
+    ]);
 
     updateProgressBar('Placing Sun...');
     await getBodyPositions('sun', true);
@@ -103,7 +113,7 @@ async function init() {
     });
     bodies.sun.sky = new THREE.Mesh(skyGeometry, skyMaterial);
     bodies.sun.sky.position.copy(initialSunPos);
-    bodies.sun.sky.lookAt(0,0,0);
+    bodies.sun.sky.lookAt(0, 0, 0);
     scene.add(bodies.sun.sky);
 
     updateProgressBar('Placing Mars...');
@@ -170,7 +180,7 @@ function animate(time) {
             body.light.position.copy(position.divideScalar(1000));
             spotLight.target.position.copy(position);
 
-            body.sky.lookAt(0,0,0);
+            body.sky.lookAt(0, 0, 0);
         }
 
         if (stepId + 2 >= body.positions.length) {
@@ -182,6 +192,36 @@ function animate(time) {
 
     controls.update();
     renderer.render(scene, camera);
+}
+
+function loadModelWithProgress(url, onProgress) {
+    return new Promise((resolve, reject) => {
+        loader.load(url,
+            (texture) => resolve(texture),
+            (xhr) => {
+                if (xhr.lengthComputable) {
+                    const percentComplete = Math.round(xhr.loaded / xhr.total * 100);
+                    onProgress(percentComplete, xhr.loaded, xhr.total);
+                }
+            },
+            (error) => reject(error)
+        );
+    });
+}
+
+function loadTextureWithProgress(url, onProgress) {
+    return new Promise((resolve, reject) => {
+        textureLoader.load(url,
+            (texture) => resolve(texture),
+            (xhr) => {
+                if (xhr.lengthComputable) {
+                    const percentComplete = Math.round(xhr.loaded / xhr.total * 100);
+                    onProgress(percentComplete, xhr.loaded, xhr.total);
+                }
+            },
+            (error) => reject(error)
+        );
+    });
 }
 
 window.onresize = () => {
