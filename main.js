@@ -200,7 +200,7 @@ function loadModelWithProgress(url, onProgress) {
             (texture) => resolve(texture),
             (xhr) => {
                 if (xhr.lengthComputable) {
-                    const percentComplete = Math.round(xhr.loaded / xhr.total * 100);
+                    const percentComplete = Math.min(Math.round(xhr.loaded / xhr.total * 100), 100);
                     onProgress(percentComplete, xhr.loaded, xhr.total);
                 }
             },
