@@ -1,6 +1,6 @@
 export const yieldToBrowser = () => new Promise(resolve => setTimeout(resolve, 300));
 
-const stepCount = 8;
+const stepCount = 13;
 let step = 0;
 
 export function updateProgressBar(context) {
@@ -13,7 +13,7 @@ export function updateProgressBar(context) {
         step++;
         const loadingContext = document.getElementById('loading-context');
         const loadingProgress = document.getElementById('loading-progress');
-        loadingContext.textContent = context;
+        if (context) loadingContext.textContent = context;
         loadingProgress.style.width = `${step / stepCount * 100}%`;
     }
 }

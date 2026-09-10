@@ -66,29 +66,40 @@ async function getBodyPositions(body, isInitial = false) {
 async function init() {
     updateProgressBar('Loading models...');
     const [phobosGltf, deimosGltf] = await Promise.all([
-        loadModelWithProgress('./assets/models/phobos.glb',
-            (percent) => console.log(percent),
-            (model) => console.log("Phobos done")),
+        loader.loadAsync('./assets/models/phobos.glb')
+            .then(model => {
+                updateProgressBar();
+                return model;
+            }),
 
-        loadModelWithProgress('./assets/models/deimos.glb',
-            (percent) => console.log(percent),
-            (model) => console.log("Deimos done")),
-    ])
+        loader.loadAsync('./assets/models/deimos.glb')
+            .then(model => {
+                updateProgressBar();
+                return model;
+            }),
+    ]);
 
     updateProgressBar('Loading textures...');
     const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
-        loadTextureWithProgress('./assets/images/Mars_8K_Surface.png',
-            (percent) => console.log(percent),
-            (texture) => console.log("Mars surface done")),
+        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png')
+            .then(texture => {
+                updateProgressBar();
+                return texture;
+            }),
 
-        loadTextureWithProgress('./assets/images/Mars_8K_Normal.png',
-            (percent) => console.log(percent),
-            (texture) => console.log("Mars normal done")),
+        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png')
+            .then(texture => {
+                updateProgressBar();
+                return texture;
+            }),
 
-        loadTextureWithProgress('./assets/images/starmap_g16k.jpg',
-            (percent) => console.log(percent),
-            (texture) => console.log("star map done")),
-    ]);
+        textureLoader.loadAsync('./assets/images/starmap_g16k.jpg')
+            .then(texture => {
+                updateProgressBar();
+                return texture;
+            }),
+
+    ])
 
     updateProgressBar('Placing Sun...');
     await getBodyPositions('sun', true);
@@ -195,42 +206,6 @@ function animate(time) {
 
     controls.update();
     renderer.render(scene, camera);
-}
-
-function loadModelWithProgress(url, onProgress, onLoad) {
-    return new Promise((resolve, reject) => {
-        loader.load(url,
-            (model) => {
-                if (onLoad) onLoad(model, url);
-                resolve(model)
-            },
-            (xhr) => {
-                if (xhr.lengthComputable) {
-                    const percentComplete = Math.min(Math.round(xhr.loaded / xhr.total * 100), 100);
-                    onProgress(percentComplete, xhr.loaded, xhr.total);
-                }
-            },
-            (error) => reject(error)
-        );
-    });
-}
-
-function loadTextureWithProgress(url, onProgress, onLoad) {
-    return new Promise((resolve, reject) => {
-        textureLoader.load(url,
-            (texture) => {
-                if (onLoad) onLoad(texture, url);
-                resolve(texture)
-            },
-            (xhr) => {
-                if (xhr.lengthComputable) {
-                    const percentComplete = Math.min(Math.round(xhr.loaded / xhr.total * 100), 100);
-                    onProgress(percentComplete, xhr.loaded, xhr.total);
-                }
-            },
-            (error) => reject(error)
-        );
-    });
 }
 
 window.onresize = () => {
