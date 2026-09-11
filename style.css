@@ -1,12 +1,4 @@
 @font-face {
-    font-family: 'Disket-Mono-Regular';
-    src: url('/assets/fonts/Disket-Mono-Regular.ttf');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
     font-family: 'Orbitron Light';
     src: url('/assets/fonts/Orbitron Light.ttf');
     font-weight: normal;
@@ -38,6 +30,23 @@ body {
     flex-direction: column;
     color: #E61E32;
 }
+
+.loading-text {
+    display: flex;
+}
+
+.loading-text .dot {
+    animation: blink 1.4s infinite ease-in-out both;
+}
+
+.loading-text .dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-text .dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
 
 .neon-red {
     color: #E61E32;
@@ -115,6 +124,15 @@ span {
     20%, 24%, 55% {
         opacity: 1;
         filter: none;
+    }
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
     }
 }
 

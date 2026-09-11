@@ -64,7 +64,7 @@ async function getBodyPositions(body, isInitial = false) {
 }
 
 async function init() {
-    updateProgressBar('Loading models...');
+    updateProgressBar('Loading models');
     const [phobosGltf, deimosGltf] = await Promise.all([
         loader.loadAsync('./assets/models/phobos.glb')
             .then(model => {
@@ -79,7 +79,7 @@ async function init() {
             }),
     ]);
 
-    updateProgressBar('Loading textures...');
+    updateProgressBar('Loading textures');
     const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
         textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png')
             .then(texture => {
@@ -101,7 +101,7 @@ async function init() {
 
     ])
 
-    updateProgressBar('Placing Sun...');
+    updateProgressBar('Placing Sun');
     await getBodyPositions('sun', true);
     const sunGeometry = new THREE.SphereGeometry(207, 32, 16);
     const sunMaterial = new THREE.MeshBasicMaterial({color: 0xffe100});
@@ -118,7 +118,7 @@ async function init() {
     bodies.sun.mesh.position.copy(initialSunPos);
     bodies.sun.light.position.copy(initialSunPos);
 
-    updateProgressBar('Placing stars...');
+    updateProgressBar('Placing stars');
     const skyGeometry = new THREE.SphereGeometry(100000, 64, 32);
     const skyMaterial = new THREE.MeshBasicMaterial({
         map: skyMap,
@@ -130,7 +130,7 @@ async function init() {
     bodies.sun.sky.lookAt(0, 0, 0);
     scene.add(bodies.sun.sky);
 
-    updateProgressBar('Placing Mars...');
+    updateProgressBar('Placing Mars');
     const marsGeometry = new THREE.SphereGeometry(1, 64, 32);
     const marsMaterial = new THREE.MeshStandardMaterial({
         map: marsSurfaceMap,
@@ -146,7 +146,7 @@ async function init() {
     bodies.mars.mesh.rotation.y = calculateMarsRotation(startTime);
     scene.add(bodies.mars.mesh);
 
-    updateProgressBar('Placing Phobos...');
+    updateProgressBar('Placing Phobos');
     await getBodyPositions('phobos', true);
     const initialPhobosPos = arrayToRotatedVector(bodies.phobos.positions[0]);
     bodies.phobos.mesh = phobosGltf.scene;
@@ -160,7 +160,7 @@ async function init() {
     })
     scene.add(bodies.phobos.mesh);
 
-    updateProgressBar('Placing Deimos...');
+    updateProgressBar('Placing Deimos');
     await getBodyPositions('deimos', true);
     const initialDeimosPos = arrayToRotatedVector(bodies.deimos.positions[0]);
     bodies.deimos.mesh = deimosGltf.scene;
@@ -174,7 +174,7 @@ async function init() {
     })
     scene.add(bodies.deimos.mesh);
 
-    updateProgressBar('Rendering scene...');
+    updateProgressBar('Rendering scene');
     await yieldToBrowser();
     renderer.render(scene, camera);
     updateProgressBar('done');
