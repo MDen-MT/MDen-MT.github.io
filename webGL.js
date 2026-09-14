@@ -108,8 +108,8 @@ async function init() {
     bodies.sun.mesh = new THREE.Mesh(sunGeometry, sunMaterial);
     bodies.sun.light = new THREE.DirectionalLight(0xffffff, 3);
     bodies.sun.light.castShadow = true;
-    bodies.sun.light.shadow.mapSize.width = 2048;
-    bodies.sun.light.shadow.mapSize.height = 2048;
+    bodies.sun.light.shadow.mapSize.width = 4096;
+    bodies.sun.light.shadow.mapSize.height = 4096;
     bodies.sun.light.shadow.bias = -0.0001;
     scene.add(bodies.sun.mesh, bodies.sun.light);
 
