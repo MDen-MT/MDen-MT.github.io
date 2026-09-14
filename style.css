@@ -117,6 +117,16 @@ body {
     bottom: 24px;
 }
 
+.contributions-svg {
+    display: flex;
+    align-items: flex-end;
+    position: absolute;
+    width: stretch;
+    height: stretch;
+    justify-content: flex-end;
+}
+
+
 .day {
     display: flex;
     flex-direction: column;
