@@ -97,6 +97,47 @@ body {
     color: white;
 }
 
+.clock {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: stretch;
+}
+
+.contributions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    width: stretch;
+    height: stretch;
+    justify-content: flex-end;
+    right: 24px;
+    bottom: 24px;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-around;
+    margin-right: 5px;
+    margin-top: 22px;
+}
+
+.months {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.small-text {
+    font-family: 'Orbitron Light', sans-serif;
+    font-size: 18px
+}
+
+
 .normal-text {
     font-family: 'Orbitron Light', sans-serif;
     font-size: 24px
@@ -149,4 +190,43 @@ span {
 ::selection {
     background: white;
     color: #E61E32;
+}
+
+.ContributionCalendar-day {
+    fill: #170305;
+    shape-rendering: geometricprecision;
+    background-color: #170305;
+    border: .5px solid transparent;
+    border-radius: 2px;
+    height: 7px !important;
+    width: 7px !important;
+}
+
+.ContributionCalendar-day[data-level="1"] {
+    fill: #5B0a12;
+    background-color: #5B0a12;
+    filter: drop-shadow(0 0 1px #5B0a12) drop-shadow(0 0 5px #5B0a12);
+}
+
+.ContributionCalendar-day[data-level="2"] {
+    fill: #890F1B;
+    background-color: #890F1B;
+    filter: drop-shadow(0 0 1px #890F1B) drop-shadow(0 0 5px #890F1B);
+}
+
+.ContributionCalendar-day[data-level="3"] {
+    fill: #B71424;
+    background-color: #B71424;
+    filter: drop-shadow(0 0 1px #B71424) drop-shadow(0 0 5px #B71424);
+}
+
+.ContributionCalendar-day[data-level="4"] {
+    fill: #E61E32;
+    background-color: #E61E32;
+    filter: drop-shadow(0 0 1px #E61E32) drop-shadow(0 0 5px #E61E32);
+}
+
+.ContributionCalendar-grid {
+    border-collapse: separate;
+    pointer-events: fill;
 }

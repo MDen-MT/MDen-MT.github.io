@@ -32,3 +32,41 @@ export function arrayToRotatedVector(array) {
 
     return vector;
 }
+
+export async function getData(url) {
+    try {
+        let request;
+        if (window.location.hostname === 'mden-mt.github.io') {
+            request = {};
+        } else {
+            const apiKey = await getAPIKey();
+            request = {
+                headers: {
+                    'x-api-key': apiKey,
+                }
+            };
+        }
+
+        const response = await fetch(url, request);
+        const data = await response;
+        return data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function getAPIKey() {
+    try {
+        const response = await fetch('secret.json');
+
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        const data = await response.json();
+
+        return data['api-key'];
+    } catch (error) {
+        console.error(error);
+    }
+}

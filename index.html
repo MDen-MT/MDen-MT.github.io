@@ -15,20 +15,56 @@
 </head>
 <body>
 <div class="wrapper">
+    <div class="clock">
+        <span class="large-text neon-red">Mars Time</span>
+        <span class="medium-text neon-white" id="martian-clock">00:00:00</span>
+    </div>
     <svg width="700px" height="800px">
-        <polygon class="polygon neon-red" points="12,24 24,12, 200,12 244,56 480,56 502,78, 502,150 480,172 420,172 398,194, 398,270, 353,315 24,315 12,303"/>
+        <polygon class="polygon neon-red"
+                 points="12,24 24,12, 200,12 244,56 480,56 502,78, 502,150 480,172 420,172 398,194, 398,270, 353,315 24,315 12,303"/>
     </svg>
     <p class="info">
         <span class="medium-text neon-white">Hello, I'm</span><br>
-        <span class="large-text neon-white" >Danila S. <</span>
+        <span class="large-text neon-white">Danila S. <</span>
         <span class="large-text neon-red">MDen</span>
         <span class="large-text neon-white">></span><br>
-        <span class="medium-text neon-red">-Software Engineer-</span><br class="neon-red"><br>
+        <span class="medium-text neon-red">-</span>
+        <span class="medium-text neon-red" id="typed-text">Software Engineer</span>
+        <span class="medium-text neon-red">-</span><br class="neon-red"><br>
         <span class="normal-text neon-white">I design and build projects</span><br>
         <span class="normal-text neon-white">ranging from open-source</span><br>
         <span class="normal-text neon-white">tools and 3D web apps </span><br>
         <span class="normal-text neon-white">to game modifications.</span><br>
     </p>
+    <div class="contributions">
+        <span class="medium-text neon-red">GitHub Contributions</span>
+        <div style="display: flex">
+            <div class="day">
+                <span class="small-text neon-white">Mon</span>
+                <span class="small-text neon-white">Wed</span>
+                <span class="small-text neon-white">Fri</span>
+            </div>
+            <div>
+                <div id="contributions-right">
+                    <div class="months">
+                        <span class="small-text neon-white">Sep</span>
+                        <span class="small-text neon-white">Oct</span>
+                        <span class="small-text neon-white">Nov</span>
+                        <span class="small-text neon-white">Dec</span>
+                        <span class="small-text neon-white">Jan</span>
+                        <span class="small-text neon-white">Feb</span>
+                        <span class="small-text neon-white">Mar</span>
+                        <span class="small-text neon-white">Apr</span>
+                        <span class="small-text neon-white">May</span>
+                        <span class="small-text neon-white">Jun</span>
+                        <span class="small-text neon-white">Jul</span>
+                        <span class="small-text neon-white">Aug</span>
+                        <span class="small-text neon-white">Sep</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="loading-screen">
     <div class="loading-text neon-red">
@@ -41,9 +77,11 @@
         <div id="loading-progress" class="progress-meter"></div>
     </div>
 </div>
-<script type="module" src="/main.js"></script>
+<script type="module" src="/webGL.js"></script>
 <script type="module" src="/celestial-bodies-positions.js"></script>
 <script type="module" src="/utils.js"></script>
 <script type="module" src="/progress-bar.js"></script>
+<script type="module" src="/typeRoleText.js"></script>
+<script type="module" src="/site.js"></script>
 </body>
 </html>

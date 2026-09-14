@@ -1,4 +1,8 @@
+import {getData} from './utils.js';
+
 const url = 'https://ssd.jpl.nasa.gov/api/horizons.api';
+
+const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
 
 const bodies = {
     'sun': {COMMAND: '10', STEP_SIZE: '24h'},
@@ -24,10 +28,11 @@ export async function getPositions(body) {
     }
 
     const queryString = new URLSearchParams(params).toString();
-    const proxyUrl = `https://jpl-proxy.mden.workers.dev/?${queryString}`;
+    const proxyUrl = `https://jpl-proxy.mden.workers.dev/?targetUrl=${encodeURIComponent(url)}&${queryString}`;
 
     let data = await getData(proxyUrl);
-    let result = data.result;
+    let json = await data.json()
+    let result = json.result;
     const timeData = result.split('$$SOE')[1].split('$$EOE')[0].split('\n');
 
     const positions = [];
@@ -43,45 +48,7 @@ export async function getPositions(body) {
     return positions;
 }
 
-async function getData(url) {
-    try {
-        let request;
-        if (window.location.hostname === 'mden-mt.github.io') {
-            request = {};
-        } else {
-            const apiKey = await getAPIKey();
-            request = {headers: {
-                    'x-api-key': apiKey,
-                }};
-        }
-
-        const response = await fetch(url, request);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function getAPIKey() {
-    try {
-        const response = await fetch('secret.json');
-
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        const data = await response.json();
-
-        return data['api-key'];
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 export function calculateMarsRotation(time) {
-    const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
-
     const elapsedTime = time - J2000;
     const d = elapsedTime / (86400000);
 
@@ -90,9 +57,7 @@ export function calculateMarsRotation(time) {
 
     let W = ((bodies.mars.W0 + bodies.mars.SPIN_RATE * d - precessionTerm) + bodies.mars.OFFSET) % 360;
 
-    if (W < 0) {
-        W += 360;
-    }
+    if (W < 0) W += 360;
 
     return W * Math.PI / 180;
 }

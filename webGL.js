@@ -6,7 +6,6 @@ import {getPositions, calculateMarsRotation} from './celestial-bodies-positions.
 import {arrayToRotatedVector, interpolatePosition} from './utils.js';
 import {updateProgressBar, yieldToBrowser} from './progress-bar.js';
 
-
 const interval1Hour = 1 / 86400000;
 const interval10Minutes = 1 / 600000;
 
