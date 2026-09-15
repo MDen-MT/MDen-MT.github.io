@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 
 import {getPositions, calculateMarsRotation} from './celestial-bodies-positions.js';
 import {arrayToRotatedVector, interpolatePosition} from './utils.js';
@@ -17,9 +21,21 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
 camera.position.set(5, 0, 0);
+
+const composer = new EffectComposer(renderer);
+
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.1, 0.1, 0);
+composer.addPass(bloomPass);
+
+const outputPass = new OutputPass();
+composer.addPass(outputPass);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -204,7 +220,7 @@ function animate(time) {
     });
 
     controls.update();
-    renderer.render(scene, camera);
+    composer.render(scene, camera);
 }
 
 window.onresize = () => {
