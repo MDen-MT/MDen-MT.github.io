@@ -2,6 +2,8 @@ import {getData} from './utils.js';
 
 const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
 
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
 function updateMartianClock() {
     const now = new Date();
     const elapsedTime = now - J2000;
@@ -37,6 +39,18 @@ async function getContributions() {
 
     document.getElementById('contributions-right').append(tbody);
 
+
+    const now = new Date();
+    const month = now.getMonth();
+
+    const monthsDiv = document.getElementsByClassName('months').item(0)
+
+    for (let i = 0; i <= months.length; i++) {
+        const month_span = document.createElement("span");
+        month_span.className = 'small-text neon-white';
+        month_span.textContent = months.at((month+i)%12);
+        monthsDiv.appendChild(month_span);
+    }
 }
 
 function parseStringToDoc(htmlString) {
