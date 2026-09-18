@@ -97,6 +97,18 @@ body {
     color: white;
 }
 
+.site-info {
+    text-align: right;
+    position: absolute;
+    right: 24px;
+    color: white;
+}
+
+.site-info-svg {
+    position: absolute;
+    right: 0;
+}
+
 .clock {
     position: absolute;
     display: flex;
