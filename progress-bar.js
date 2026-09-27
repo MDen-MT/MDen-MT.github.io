@@ -7,8 +7,8 @@ export function updateProgressBar(context) {
     if (context === "done") {
         const loadingScreen = document.querySelectorAll('.loading-screen')[0];
         const wrapper = document.querySelectorAll('.wrapper')[0];
-        loadingScreen.style.display = 'none';
-        wrapper.style.display = 'flex';
+        loadingScreen.classList.add('hidden');
+        wrapper.classList.remove('hidden');
     } else {
         step++;
         const loadingContext = document.getElementById('loading-context');

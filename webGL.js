@@ -13,6 +13,8 @@ import {updateProgressBar, yieldToBrowser} from './progress-bar.js';
 const interval1Hour = 1 / 86400000;
 const interval10Minutes = 1 / 600000;
 
+const sizeFactor = 0.002;
+
 const startTime = Date.now();
 
 const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -49,8 +51,8 @@ controls.autoRotateSpeed = 0.1;
 const loader = new GLTFLoader();
 const textureLoader = new THREE.TextureLoader();
 
-const AmbientLight = new THREE.AmbientLight(0xffc2b3, 0.003);
-scene.add(AmbientLight);
+const ambientLight = new THREE.AmbientLight(0xffc2b3, 0.003);
+scene.add(ambientLight);
 
 const spotLight = new THREE.SpotLight(0xffc2b3, 0.3);
 spotLight.position.set(0, 0, 0);
@@ -194,6 +196,29 @@ async function init() {
     renderer.render(scene, camera);
     updateProgressBar('done');
     renderer.setAnimationLoop(animate);
+}
+
+export function changeLightMode(lightMode) {
+    if (lightMode === 0) {
+        ambientLight.intensity = 0.003;
+        spotLight.intensity = 0.3;
+        bodies.sun.light.intensity = 3;
+    } else if (lightMode === 1) {
+        ambientLight.intensity = 0.1;
+        spotLight.intensity = 0.3;
+        bodies.sun.light.intensity = 3;
+    } else if (lightMode === 2) {
+        ambientLight.intensity = 2;
+        spotLight.intensity = 0;
+        bodies.sun.light.intensity = 0;
+    }
+}
+
+export function changeMoonSize(size) {
+    if (size) {
+        bodies.deimos.mesh.scale.setScalar(size * sizeFactor);
+        bodies.phobos.mesh.scale.setScalar(size * sizeFactor);
+    }
 }
 
 function animate(time) {

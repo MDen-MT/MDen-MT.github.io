@@ -20,6 +20,14 @@ body {
     font-family: 'Orbitron Light', sans-serif;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.fade-out {
+    opacity: 0;
+}
+
 .loading-screen {
     display: flex;
     position: absolute;
@@ -76,11 +84,48 @@ body {
 }
 
 .wrapper {
-    display: none;
+    display: flex;
     position: absolute;
     pointer-events: none;
     width: 100%;
     height: 100%;
+}
+
+.show-ui {
+    display: flex;
+    position: absolute;
+    pointer-events: none;
+    right: 0;
+    transition: opacity 1s ease;
+}
+
+.circle-fill {
+    transform: translate(200px, 323px) scale(1.5);
+    fill: white;
+}
+
+.circle-half-fill {
+    transform: translate(200px, 323px) scale(1.5);
+    fill: white;
+}
+
+.transparent {
+    fill: #FFFFFF40;
+}
+
+.arrows {
+    transform: translate(273px, 320px) scale(2);
+    fill: white;
+}
+
+.eye {
+    transform: translate(42px, 12px) scale(2);
+    fill: white;
+}
+
+.eye-slash {
+    transform: translate(351px, 320px) scale(2);
+    fill: white;
 }
 
 .polygon {
@@ -89,6 +134,60 @@ body {
     padding: 10px;
     fill: #E61E320C;
     pointer-events: fill;
+}
+
+.polygon-white {
+    stroke-width: 3px;
+    stroke: white;
+    padding: 10px;
+    fill: #FFFFFF0C;
+    pointer-events: fill;
+}
+
+.button-polygon {
+    stroke-width: 3px;
+    stroke: white;
+    padding: 10px;
+    fill: #FFFFFF0C;
+    pointer-events: fill;
+    cursor: pointer;
+}
+
+.button-polygon:hover {
+    transform: translate(0px, 3px);
+}
+
+.button-polygon.active {
+    transform: translate(0px, 3px);
+}
+
+#button-1:hover ~ .circle-fill {
+    transform: translate(200px, 326px) scale(1.5);
+}
+
+#button-1:hover ~ .circle-half-fill {
+    transform: translate(200px, 326px) scale(1.5);
+}
+
+#button-2:hover ~ .arrows {
+    transform: translate(273px, 323px) scale(2);
+}
+
+#button-2.active ~ .arrows {
+    transform: translate(273px, 323px) scale(2);
+}
+
+#button-3:hover ~ .eye {
+    transform: translate(351px, 323px) scale(2);
+}
+
+#button-3:hover ~ .eye-slash {
+    transform: translate(351px, 323px) scale(2);
+}
+
+.button-info {
+    text-align: center;
+    margin: 30px 0 0 0;
 }
 
 .info {
@@ -107,6 +206,74 @@ body {
 .site-info-svg {
     position: absolute;
     right: 0;
+}
+
+.moon-scale-content {
+    margin: 40px 0 0 0;
+}
+
+.moon-scale-up {
+    display: flex;
+    justify-content: space-between;
+}
+
+.moon-scale-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: stretch;
+    background-color: transparent;
+}
+
+.moon-scale-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: transparent;
+    border: 4px solid #E61E32;
+    cursor: pointer;
+}
+
+.moon-scale-range::-moz-range-thumb {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: transparent;
+    border: 4px solid #E61E32;
+    cursor: pointer;
+}
+
+.rail {
+    height: 30px;
+    display: flex;
+    position: relative;
+    top: -35px;
+    width: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center
+}
+
+.left-rail {
+    height: 4px;
+    width: 15.5px;
+    background: white;
+}
+
+.right-rail {
+    height: 4px;
+    width: 381.5px;
+    background: white;
+}
+
+.moon-scale-input {
+    font-family: 'Orbitron Light', sans-serif;
+    font-size: 24px;
+    background: transparent;
+    width: 150px;
+    border: none;
+    text-align: right;
 }
 
 .clock {
@@ -179,6 +346,20 @@ span {
     pointer-events: fill;
 }
 
+input {
+    pointer-events: fill;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 @keyframes brokenLight {
     0%, 18%, 22%, 25%, 53%, 57%, 100% {
         opacity: 1;
@@ -195,6 +376,12 @@ span {
         opacity: 0;
     }
     50% {
+        opacity: 1;
+    }
+}
+
+@keyframes show {
+    0%, 100% {
         opacity: 1;
     }
 }
