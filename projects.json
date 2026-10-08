@@ -1,0 +1,42 @@
+[
+  {
+    "title": "Image2Banners",
+    "description": "Desktop tool converting images into Minecraft banner arrays via DeltaE & SSIM algorithms. Features a custom binary writer for native NBT structure export. 100+ GitHub stars.",
+    "link": "https://github.com/MARSTeamMC/Image2Banners",
+    "source_link": "https://github.com/MARSTeamMC/Image2Banners",
+    "image": "Image2Banners.png",
+    "publication_date": "Dec 2024"
+  },
+  {
+    "title": "InstantBreak",
+    "description": "In Minecraft, you can instantly break stone, but not wood, glass, or deepslate. InstantBreak fixes that. It allows instant breaking of most blocks.\n\nThis mod changes Minecraft's break calculation for strong, like netherite or gold tools to instamine easier. For example, you only need a netherite axe with efficiency V to instantly break wood. It also expands which tools are considered valid for certain blocks. For example, pickaxes can now break glass, and axes can break skulls.",
+    "link": "https://modrinth.com/mod/instantbreak",
+    "source_link": "https://github.com/MARSTeamMC/InstantBreak",
+    "image": "IB.png",
+    "publication_date": "Aug 2025"
+  },
+  {
+    "title": "NoWeatherSkip",
+    "description": "In Minecraft, sleeping always skips rain and snow. NoWeatherSkip changes this. Now, when players sleep, rain and snow remain and change naturally afterward, but thunder changes to a less dangerous variant.",
+    "link": "https://modrinth.com/mod/noweatherskip",
+    "source_link": "https://github.com/MARSTeamMC/NoWeatherSkip",
+    "image": "NWS.png",
+    "publication_date": "Aug 2025"
+  },
+  {
+    "title": "NotFullyBroken",
+    "description": "In Minecraft, you can easily break your best tools if something distracts you. NotFullyBroken fixes that. Now, all tools with mending and 0 durability will change to their broken state, in which you can't use them. To move them out of the broken state, you simply recover them using XP.",
+    "link": "https://modrinth.com/mod/notfullybroken",
+    "source_link": "https://github.com/MARSTeamMC/NotFullyBroken",
+    "image": "NFB.png",
+    "publication_date": "Dec 2025"
+  },
+  {
+    "title": "Portfolio Site",
+    "description": "Interactive portfolio site with a live, accurate model of Mars, its moons, Phobos and Deimos, and the Sun. Using real time data from the NASA JPL API and astronomical physics, every position reflects where these bodies are in space in this exact moment.",
+    "link": "https://mden-mt.github.io/",
+    "source_link": "https://github.com/MDen-MT/MDen-MT.github.io",
+    "image": "Portfolio.png",
+    "publication_date": "Oct 2026"
+  }
+]

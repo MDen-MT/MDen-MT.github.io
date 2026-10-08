@@ -1,14 +1,6 @@
 @font-face {
     font-family: 'Orbitron Light';
-    src: url('/assets/fonts/Orbitron Light.ttf');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Orbitron Bold';
-    src: url('/assets/fonts/Orbitron Bold.ttf');
+    src: url('/assets/fonts/Orbitron.ttf');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -99,6 +91,30 @@ body {
     transition: opacity 1s ease;
 }
 
+.project-wrapper {
+    display: flex;
+    position: absolute;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.project-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: stretch;
+    height: stretch;
+}
+
+.hide-projects {
+    display: flex;
+    position: absolute;
+    pointer-events: none;
+    transition: opacity 1s ease;
+}
+
 .circle-fill {
     transform: translate(200px, 323px) scale(1.5);
     fill: white;
@@ -183,6 +199,32 @@ body {
 
 #button-3:hover ~ .eye-slash {
     transform: translate(351px, 323px) scale(2);
+}
+
+.button-4-text {
+    position: absolute;
+    top: 312px;
+    left: 24px;
+    width: 329px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.button-4-text span {
+    pointer-events: none;
+}
+
+.button-5-text {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    width: 329px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.button-5-text span {
+    pointer-events: none;
 }
 
 .button-info {
@@ -338,7 +380,7 @@ body {
 }
 
 .large-text {
-    font-family: 'Orbitron Bold', sans-serif;
+    font-family: 'Orbitron ExtraBold', sans-serif;
     font-size: 48px;
 }
 

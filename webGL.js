@@ -7,7 +7,7 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 
 import {getPositions, calculateMarsRotation} from './celestial-bodies-positions.js';
-import {arrayToRotatedVector, interpolatePosition} from './utils.js';
+import {arrayToRotatedVector, interpolatePosition, isInsidePolygon} from './utils.js';
 import {updateProgressBar, yieldToBrowser} from './progress-bar.js';
 
 const interval1Hour = 1 / 86400000;
@@ -27,6 +27,9 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
 camera.position.set(5, 0, 0);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
 
 const composer = new EffectComposer(renderer);
 
@@ -61,12 +64,27 @@ spotLight.decay = 0;
 scene.add(spotLight);
 scene.add(spotLight.target)
 
+let projectCount = 0;
+let currentProject = 0;
+let previousProject = 0;
+let projectAngle = 0;
+
+let animatingCamera = false;
+let animatingStartTime = -1;
+let animatingDirection = 0;
+const animationLength = 500;
+
 const bodies = {
     sun: {interval: interval1Hour, positions: [], isAwaiting: true, mesh: null, light: null, sky: null},
     phobos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
     deimos: {interval: interval10Minutes, positions: [], isAwaiting: true, mesh: null},
     mars: {mesh: null},
 }
+
+let project_cards = [];
+
+const link_polygon = [[0.522, 0.049], [0.494, 0.001], [0.72, 0.001], [0.748, 0.049]];
+const source_polygon = [[0.753, 0.049], [0.725, 0.001], [0.951, 0.001], [0.979, 0.049]];
 
 async function getBodyPositions(body, isInitial = false) {
     bodies[body].isAwaiting = true;
@@ -98,19 +116,19 @@ async function init() {
 
     updateProgressBar('Loading textures');
     const [marsSurfaceMap, marsNormalMap, skyMap] = await Promise.all([
-        textureLoader.loadAsync('./assets/images/Mars_8K_Surface.png')
+        textureLoader.loadAsync('./assets/textures/Mars_8K_Surface.png')
             .then(texture => {
                 updateProgressBar();
                 return texture;
             }),
 
-        textureLoader.loadAsync('./assets/images/Mars_8K_Normal.png')
+        textureLoader.loadAsync('./assets/textures/Mars_8K_Normal.png')
             .then(texture => {
                 updateProgressBar();
                 return texture;
             }),
 
-        textureLoader.loadAsync('./assets/images/starmap_g16k.jpg')
+        textureLoader.loadAsync('./assets/textures/starmap_g16k.jpg')
             .then(texture => {
                 updateProgressBar();
                 return texture;
@@ -191,6 +209,91 @@ async function init() {
     })
     scene.add(bodies.deimos.mesh);
 
+    updateProgressBar('Creating project cards');
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext('2d');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+    ctx.moveTo(24, 12);
+    ctx.lineTo(12, 24);
+    ctx.lineTo(12, 696);
+    ctx.lineTo(24, 708);
+    ctx.lineTo(632, 708);
+    ctx.lineTo(664, 676);
+    ctx.lineTo(1256, 676);
+    ctx.lineTo(1268, 664);
+    ctx.lineTo(1268, 24);
+    ctx.lineTo(1256, 12);
+    ctx.closePath();
+
+    ctx.fillStyle = '#E61E320C';
+    ctx.fill();
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#E61E32";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(668, 686);
+    ctx.lineTo(636, 718);
+    ctx.lineTo(921, 718);
+    ctx.lineTo(953, 686);
+    ctx.closePath();
+
+    ctx.fillStyle = '#FFFFFF0C';
+    ctx.fill();
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(965, 686);
+    ctx.lineTo(933, 718);
+    ctx.lineTo(1218, 718);
+    ctx.lineTo(1250, 686);
+    ctx.closePath();
+
+    ctx.fillStyle = '#FFFFFF0C';
+    ctx.fill();
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
+
+    ctx.fillStyle = '#FFFFFF'
+    ctx.font = '24px "Orbitron Light", sans-serif';
+
+    ctx.fillText('Link', 668, 710);
+    ctx.fillText('Sources', 965, 710);
+
+    const geometry = new THREE.PlaneGeometry(0.5, 0.28125);
+    const material = new THREE.MeshStandardMaterial({
+        side: THREE.DoubleSide,
+        opacity: 1.0,
+        alphaTest: 0.01,
+        transparent: true,
+        emissive: 0xE61E32,
+        emissiveIntensity: 1,
+    });
+
+    const response = await fetch('projects.json');
+    const data = await response.json();
+    projectCount = data.length;
+    projectAngle = 360 / projectCount;
+    for (let i = 0; i < projectCount; i++) {
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = 1280;
+        newCanvas.height = 720;
+        const ctx_copy = newCanvas.getContext('2d');
+        ctx_copy.drawImage(canvas, 0, 0);
+        createProjectCard(data.at(i), i, ctx_copy, geometry, material.clone());
+    }
+
     updateProgressBar('Rendering scene');
     await yieldToBrowser();
     renderer.render(scene, camera);
@@ -198,27 +301,77 @@ async function init() {
     renderer.setAnimationLoop(animate);
 }
 
-export function changeLightMode(lightMode) {
-    if (lightMode === 0) {
-        ambientLight.intensity = 0.003;
-        spotLight.intensity = 0.3;
-        bodies.sun.light.intensity = 3;
-    } else if (lightMode === 1) {
-        ambientLight.intensity = 0.1;
-        spotLight.intensity = 0.3;
-        bodies.sun.light.intensity = 3;
-    } else if (lightMode === 2) {
-        ambientLight.intensity = 2;
-        spotLight.intensity = 0;
-        bodies.sun.light.intensity = 0;
-    }
-}
+function createProjectCard(project, id, ctx, geometry, material) {
+    const img_texture = textureLoader.load('./assets/images/' + project.image, function (loadedTexture) {
+        const canvas = ctx.canvas;
 
-export function changeMoonSize(size) {
-    if (size) {
-        bodies.deimos.mesh.scale.setScalar(size * sizeFactor);
-        bodies.phobos.mesh.scale.setScalar(size * sizeFactor);
-    }
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '48px "Orbitron ExtraBold", sans-serif';
+        ctx.fillText(project.title, 652, 72);
+
+        ctx.fillStyle = '#FFFFFF'
+        ctx.font = '24px "Orbitron Light", sans-serif';
+
+        const descriptionParagraphs = project.description.split('\n');
+        let lineId = 0;
+        for (let paragraphId = 0; paragraphId < descriptionParagraphs.length; paragraphId++) {
+            const descriptionWords = descriptionParagraphs.at(paragraphId).split(' ');
+            let lineText = descriptionWords.at(0);
+            for (let wordId = 1; wordId < descriptionWords.length; wordId++) {
+                const testLineText = lineText + ' ' + descriptionWords.at(wordId);
+                if (ctx.measureText(testLineText).width >= 600) {
+                    ctx.fillText(lineText, 652, 108 + 30 * lineId);
+                    lineText = descriptionWords[wordId];
+                    lineId++;
+                } else {
+                    lineText = testLineText;
+                }
+            }
+            ctx.fillText(lineText, 652, 108 + 30 * lineId);
+            lineId++;
+        }
+
+        ctx.fillText('Publication Date: ' + project.publication_date, 36, 684);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        material.map = texture;
+
+        const radius = 1.75;
+        const angle = projectAngle * id;
+        const rad = angle * Math.PI / 180;
+        const x = radius * Math.cos(rad);
+        const z = radius * Math.sin(rad);
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.set(x, 0, z);
+        mesh.rotateY(Math.PI / 2 - rad);
+        scene.add(mesh);
+        mesh.visible = false;
+
+        const img_width = img_texture.image.width;
+        const img_height = img_texture.image.height;
+        const img_ratio = img_width / img_height;
+        const img_geometry = new THREE.PlaneGeometry(0.2375, 0.2375 / img_ratio);
+
+        const img_material = new THREE.MeshBasicMaterial({
+            map: img_texture,
+            side: THREE.DoubleSide,
+        });
+
+        const img_x = (radius + 0.001) * Math.cos(rad);
+        const img_z = (radius + 0.001) * Math.sin(rad);
+        const img_mesh = new THREE.Mesh(img_geometry, img_material);
+        img_mesh.position.set(img_x, 0.13 - 0.2375 / img_ratio / 2, img_z);
+        img_mesh.rotateY(Math.PI / 2 - rad);
+        img_mesh.translateX(-0.12)
+        scene.add(img_mesh);
+        img_mesh.visible = false;
+
+        project_cards.push({
+            mesh: mesh,
+            img: img_mesh,
+            project: project,
+        });
+    });
 }
 
 function animate(time) {
@@ -244,11 +397,119 @@ function animate(time) {
         body.mesh.lookAt(0, 0, 0);
     });
 
+    if (animatingCamera) {
+        if (animatingStartTime === -1) {
+            animatingStartTime = time;
+        } else if (time >= animatingStartTime + animationLength) {
+            animatingStartTime = -1;
+            animatingCamera = false;
+            moveCameraToProject();
+        } else {
+            const radius = camera.position.length();
+            const angle = projectAngle * (previousProject + (time - animatingStartTime) / animationLength * animatingDirection);
+            const rad = angle * Math.PI / 180;
+            const x = radius * Math.cos(rad);
+            const z = radius * Math.sin(rad);
+            camera.position.set(x, 0, z);
+        }
+    }
+
     controls.update();
     composer.render(scene, camera);
 }
 
-window.onresize = () => {
+export function changeLightMode(lightMode) {
+    if (lightMode === 0) {
+        ambientLight.intensity = 0.003;
+        spotLight.intensity = 0.3;
+        bodies.sun.light.intensity = 3;
+    } else if (lightMode === 1) {
+        ambientLight.intensity = 0.1;
+        spotLight.intensity = 0.3;
+        bodies.sun.light.intensity = 3;
+    } else if (lightMode === 2) {
+        ambientLight.intensity = 2;
+        spotLight.intensity = 0;
+        bodies.sun.light.intensity = 0;
+    }
+}
+
+export function changeMoonSize(size) {
+    if (size) {
+        bodies.deimos.mesh.scale.setScalar(size * sizeFactor);
+        bodies.phobos.mesh.scale.setScalar(size * sizeFactor);
+    }
+}
+
+export function showProjects() {
+    controls.enableDamping = false;
+    controls.autoRotate = false;
+    controls.update();
+    camera.position.set(2, 0, 0);
+    project_cards.forEach(project => {
+        project.mesh.visible = true;
+        project.img.visible = true;
+    })
+    moveCameraToProject();
+}
+
+export function hideProjects() {
+    controls.enableDamping = true;
+    controls.autoRotate = true;
+    controls.update();
+    camera.position.set(5, 0, 0);
+    project_cards.forEach(project => {
+        project.mesh.visible = false;
+        project.img.visible = false;
+    })
+}
+
+export function changeProject(direction) {
+    if (animatingCamera === false) {
+        previousProject = currentProject;
+        currentProject = (currentProject + direction) % projectCount;
+        if (currentProject < 0) {
+            currentProject = projectCount - 1;
+        }
+        animatingCamera = true;
+        animatingDirection = direction;
+    }
+}
+
+function moveCameraToProject() {
+    const radius = camera.position.length();
+    const angle = projectAngle * currentProject;
+    const rad = angle * Math.PI / 180;
+    const x = radius * Math.cos(rad);
+    const z = radius * Math.sin(rad);
+    camera.position.set(x, 0, z);
+}
+
+renderer.domElement.addEventListener('click', (event) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / window.innerWidth) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const cards = project_cards.map(card => card.mesh);
+    const projects = project_cards.map(card => card.project);
+    const intersects = raycaster.intersectObjects(cards, true);
+    if (intersects.length > 0) {
+        const firstHit = intersects[0];
+        const object = firstHit.object;
+        const project = projects[cards.indexOf(object)];
+        if (object.visible) {
+            const [x, y] = firstHit.uv;
+            if (isInsidePolygon(x, y, link_polygon)) {
+                window.open(project.link, "_blank").focus();
+            } else if (isInsidePolygon(x, y, source_polygon)) {
+                window.open(project.source_link, "_blank").focus();
+            }
+        }
+    }
+})
+
+export function changeCanvasRatio() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);

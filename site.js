@@ -1,5 +1,12 @@
 import {getData} from './utils.js';
-import {changeLightMode, changeMoonSize} from "./webGL.js";
+import {
+    changeCanvasRatio,
+    changeLightMode,
+    changeMoonSize,
+    changeProject,
+    hideProjects,
+    showProjects
+} from "./webGL.js";
 
 const J2000 = Date.UTC(2000, 0, 1, 12, 0, 0);
 
@@ -26,6 +33,8 @@ function updateMartianClock() {
 setInterval(updateMartianClock, 1000);
 updateMartianClock();
 
+const projectButtons = document.getElementsByClassName('project-buttons').item(0);
+projectButtons.style.width = `${(window.innerHeight+205)/0.813}px`;
 
 const phrases = [
     "Software Engineer",
@@ -119,34 +128,67 @@ const buttonDescriptions = [
 let lightMode = 0;
 let showMoonSizeWindow = false;
 let UIIsHidden = false;
+let showingProjects = false;
 
 let hoverTime;
 
 buttons.forEach(button => {
     button.addEventListener('mouseenter', () => {
-        if (!showMoonSizeWindow) {
-            hoverTime = setTimeout(() => {
-                infoBox.classList.remove('hidden');
-                infoText.parentElement.classList.remove('hidden');
-                const buttonId = parseInt(button.id.split('-').at(1));
-                infoText.textContent = buttonDescriptions.at(buttonId - 1);
-            }, 500);
+        const buttonId = parseInt(button.id.split('-').at(1)) - 1;
+        if (buttonId === 3) {
+            const texts = document.querySelectorAll(".button-4-text");
+            texts.forEach(text => {
+                text.style.top = "315px";
+            })
+        } else {
+            if (!showMoonSizeWindow) {
+                hoverTime = setTimeout(() => {
+                    infoBox.classList.remove('hidden');
+                    infoText.parentElement.classList.remove('hidden');
+                    const buttonId = parseInt(button.id.split('-').at(1));
+                    infoText.textContent = buttonDescriptions.at(buttonId - 1);
+                }, 500);
+            }
         }
     })
 })
 
 buttons.forEach(button => {
     button.addEventListener('mouseleave', () => {
-        clearTimeout(hoverTime);
-        infoBox.classList.add('hidden');
-        infoText.textContent = '';
-        infoText.parentElement.classList.add('hidden');
+        const buttonId = parseInt(button.id.split('-').at(1)) - 1;
+        if (buttonId === 3) {
+            const texts = document.querySelectorAll(".button-4-text");
+            texts.forEach(text => {
+                text.style.top = "312px";
+            })
+        } else {
+            clearTimeout(hoverTime);
+            infoBox.classList.add('hidden');
+            infoText.textContent = '';
+            infoText.parentElement.classList.add('hidden');
+        }
     })
 })
 
 function hideShowUIButton() {
     document.getElementsByClassName('show-ui').item(0).classList.add('fade-out');
 }
+
+function hideProjectButton() {
+    document.getElementsByClassName('hide-projects').item(0).classList.add('fade-out');
+}
+
+document.getElementById("right-project-button").addEventListener('click', (event) => {
+    if (showingProjects) {
+        changeProject(-1);
+    }
+});
+
+document.getElementById("left-project-button").addEventListener('click', (event) => {
+    if (showingProjects) {
+        changeProject(1);
+    }
+});
 
 buttons.forEach(button => {
     button.addEventListener('click', (event) => {
@@ -188,6 +230,13 @@ buttons.forEach(button => {
             document.getElementsByClassName('wrapper').item(0).classList.add('hidden');
             document.getElementsByClassName('show-ui').item(0).classList.remove('hidden');
             setTimeout(hideShowUIButton, 1000);
+        } else if (buttonId === 3) {
+            showingProjects = !showingProjects;
+            document.getElementsByClassName('wrapper').item(0).classList.add('hidden');
+            document.getElementsByClassName('hide-projects').item(0).classList.remove('hidden');
+            document.getElementsByClassName('project-wrapper').item(0).classList.remove('hidden');
+            setTimeout(hideProjectButton, 1000);
+            showProjects();
         }
     })
 })
@@ -207,6 +256,26 @@ document.getElementById('show-ui').addEventListener('click', (event) => {
     document.getElementsByClassName('show-ui').item(0).classList.remove('fade-out');
     document.getElementsByClassName('show-ui').item(0).classList.add('hidden');
     UIIsHidden = false;
+})
+
+
+document.getElementById('hide-projects').addEventListener('mouseenter', () => {
+    document.getElementsByClassName('hide-projects').item(0).classList.remove('fade-out');
+})
+
+document.getElementById('hide-projects').addEventListener('mouseleave', () => {
+    if (!document.getElementsByClassName('hide-projects').item(0).classList.contains('hidden')) {
+        hideProjectButton();
+    }
+})
+
+document.getElementById('hide-projects').addEventListener('click', (event) => {
+    document.getElementsByClassName('wrapper').item(0).classList.remove('hidden');
+    document.getElementsByClassName('hide-projects').item(0).classList.remove('fade-out');
+    document.getElementsByClassName('hide-projects').item(0).classList.add('hidden');
+    document.getElementsByClassName('project-wrapper').item(0).classList.add('hidden');
+    hideProjects();
+    showingProjects = !showingProjects;
 })
 
 
@@ -253,6 +322,44 @@ document.addEventListener('keydown', (event) => {
             document.getElementById("moon-scale-content").classList.add('hidden');
             button.classList.remove('active');
             showMoonSizeWindow = false;
+        } else if (showingProjects) {
+            document.getElementsByClassName('wrapper').item(0).classList.remove('hidden');
+            document.getElementsByClassName('hide-projects').item(0).classList.remove('fade-out');
+            document.getElementsByClassName('hide-projects').item(0).classList.add('hidden');
+            document.getElementsByClassName('project-wrapper').item(0).classList.add('hidden');
+            hideProjects();
+            showingProjects = !showingProjects;
+        }
+    } else if (event.key === 'p') {
+        if (document.querySelector('.loading-screen').classList.contains('hidden')) {
+            if (showingProjects) {
+                document.getElementsByClassName('wrapper').item(0).classList.remove('hidden');
+                document.getElementsByClassName('hide-projects').item(0).classList.remove('fade-out');
+                document.getElementsByClassName('hide-projects').item(0).classList.add('hidden');
+                document.getElementsByClassName('project-wrapper').item(0).classList.add('hidden');
+                hideProjects();
+            } else {
+                document.getElementsByClassName('wrapper').item(0).classList.add('hidden');
+                document.getElementsByClassName('hide-projects').item(0).classList.remove('hidden');
+                document.getElementsByClassName('project-wrapper').item(0).classList.remove('hidden');
+                setTimeout(hideProjectButton, 1000);
+                showProjects();
+            }
+            showingProjects = !showingProjects;
+        }
+    } else if (event.key === "ArrowRight") {
+        if (showingProjects) {
+            changeProject(-1);
+        }
+    } else if (event.key === "ArrowLeft") {
+        if (showingProjects) {
+            changeProject(1);
         }
     }
 })
+
+window.onresize = () => {
+    changeCanvasRatio();
+    projectButtons.style.width = `${(window.innerHeight+205)/0.813}px`;
+}
+

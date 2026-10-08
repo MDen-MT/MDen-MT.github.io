@@ -1,6 +1,6 @@
 export const yieldToBrowser = () => new Promise(resolve => setTimeout(resolve, 300));
 
-const stepCount = 13;
+const stepCount = 14;
 let step = 0;
 
 export function updateProgressBar(context) {
